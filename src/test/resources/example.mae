@@ -1,0 +1,36 @@
+{
+ s_m_m2io_version
+ :::
+ 2.0.0
+}
+
+f_m_ct {
+ s_m_title
+ s_m_entry_id
+ r_yet_another_value
+ :::
+ PROJECT
+ 12345
+ 42
+ m_depend[2] {
+  # First column is dependency index #
+  i_m_depend_dependency
+  s_m_depend_property
+  :::
+  1 10 i_prop_1
+  2 10 i_prop_2
+  :::
+ }
+ m_atom[3] {
+  # First column is atom index #
+  r_m_x_coord
+  r_m_y_coord
+  r_m_z_coord
+  s_m_chain_name
+  :::
+  1 -1.234567 -2.34567 -4.567890 X
+  2 -1.234567 -2.34567 -4.567890 Y
+  3 -1.234567 -2.34567 -4.567890 Z
+  :::
+ }
+}
