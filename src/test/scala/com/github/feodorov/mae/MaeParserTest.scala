@@ -24,8 +24,8 @@ class MaeParserTest extends FlatSpec with Matchers {
             MaeString("r_yet_another_value") -> MaeString("42"),
             MaeString("s_m_title") -> MaeString("PROJECT"),
             MaeString("s_m_entry_id") -> MaeString("12345"),
-            MaeString("") -> MaeArray(
-              name = "", //TODO should not be empty
+            MaeString("m_depend") -> MaeArray(
+              name = "m_depend",
               header = Seq(
                 MaeString("# First column is dependency index #"),
                 MaeString("i_m_depend_dependency"),

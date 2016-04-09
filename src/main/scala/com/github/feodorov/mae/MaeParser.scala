@@ -26,13 +26,16 @@ class MaeParser(val input: ParserInput) extends Parser {
       zeroOrMore(MaeArr) ~
       CloseBracket ~>
       ((name: MaeString, keys: MaeStringsBlock, values: MaeStringsBlock, arrays: Seq[MaeArray]) => {
+        //first array name is captured as last string of MaeStrBlock => fix it
+        val firstArrName = values.lines.drop(keys.lines.size).map(_.value).headOption.getOrElse("")
         arrays.foldLeft {
           MaeObject(
             name.value.trim(),
             keys.lines.zip(values.lines).toMap[MaeValue, MaeValue]
           )
-        } { case (acc, arr @ MaeArray(arrname, _, _)) =>
-          acc.copy(fields = acc.fields + (MaeString(arrname) -> arr))
+        } { case (acc, arr @ MaeArray(arrName, _, _)) =>
+          val arrayName = if (arrName.isEmpty) firstArrName else arrName
+          acc.copy(fields = acc.fields + (MaeString(arrayName) -> arr.copy(name = arrayName)))
         }
       }
     )
@@ -55,8 +58,8 @@ class MaeParser(val input: ParserInput) extends Parser {
   }
 
   private[this] def MaeStr = rule {
-    NlWs ~ capture(!ColonSeparator ~ zeroOrMore(LineChars)) ~ WhiteSpace ~>
-      (MaeString(_))
+    NlWs ~ capture(!ColonSeparator ~ zeroOrMore(LineChars) ~ WhiteSpace) ~>
+      (s => MaeString(s.trim()))
   }
 
   private[this] def ColonSeparator = rule { NlWs ~ 3.times(Colon) ~ WhiteSpace }
