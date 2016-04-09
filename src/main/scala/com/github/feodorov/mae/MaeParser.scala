@@ -15,7 +15,7 @@ class MaeParser(val input: ParserInput) extends Parser {
   private[this] case class MaeStringsBlock(lines: Seq[MaeString])
 
   def Mae = rule {
-    WhiteSpace ~ zeroOrMore(MaeObj).separatedBy(NlWs) ~ EOI
+    WhiteSpace ~ zeroOrMore(MaeObj) ~ EOI
   }
 
   private[this] def MaeObj = rule {
@@ -24,7 +24,7 @@ class MaeParser(val input: ParserInput) extends Parser {
       ColonSeparator ~
       MaeStrBlock ~
       zeroOrMore(MaeArr) ~
-      CloseBracket ~>
+      CloseBracket ~ NlWs ~>
       ((name: MaeString, keys: MaeStringsBlock, values: MaeStringsBlock, arrays: Seq[MaeArray]) => {
         //first array name is captured as last string of MaeStrBlock => fix it
         val firstArrName = values.lines.drop(keys.lines.size).map(_.value).headOption.getOrElse("")
