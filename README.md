@@ -1,2 +1,3 @@
 # MAE parser
-Powered by parboiled2
+
+MAE file format parser, powered by parboiled2

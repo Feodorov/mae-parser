@@ -4,15 +4,19 @@ package com.github.feodorov.mae
   * @author kfeodorov 
   * @since 07.04.16
   */
+import java.io.ByteArrayOutputStream
+
 import org.parboiled2._
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Failure, Success}
 
-class MaeParserTest extends FlatSpec with Matchers {
+class MaeTest extends FlatSpec with Matchers {
 
-  "The MaeParser" should "parse" in {
-    parse(scala.io.Source.fromInputStream(getClass().getResourceAsStream("/example.mae")).mkString) shouldBe
+  val src = scala.io.Source.fromInputStream(getClass().getResourceAsStream("/example.mae")).mkString
+
+  "MaeParser" should "parse" in {
+    parse(src) shouldBe
       Seq(
         MaeObject(
           name = "",
@@ -54,6 +58,13 @@ class MaeParserTest extends FlatSpec with Matchers {
           )
         )
       )
+  }
+
+  "MaePrinter" should "print" in {
+    val baos = new ByteArrayOutputStream()
+    MaePrinter.print(baos, parse(src))
+    baos.close()
+    baos.toString.split("\\r?\\n").filter(_.nonEmpty) shouldBe src.split("\\r?\\n").filter(_.nonEmpty)
   }
 
   def parse(s: String) = {

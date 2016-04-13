@@ -2,7 +2,7 @@ package com.github.feodorov.mae
 
 import org.parboiled2._
 
-import scala.collection.immutable.Seq
+import scala.collection.immutable.{ListMap, Seq}
 
 /**
   * @author kfeodorov 
@@ -31,7 +31,7 @@ class MaeParser(val input: ParserInput) extends Parser {
         arrays.foldLeft {
           MaeObject(
             name.value.trim(),
-            keys.lines.zip(values.lines).toMap[MaeValue, MaeValue]
+            ListMap[MaeValue, MaeValue](keys.lines.zip(values.lines):_*)
           )
         } { case (acc, arr @ MaeArray(arrName, _, _)) =>
           val arrayName = if (arrName.isEmpty) firstArrName else arrName
@@ -46,8 +46,8 @@ class MaeParser(val input: ParserInput) extends Parser {
       MaeStrBlock ~
       ColonSeparator ~
       MaeStrBlock ~
-      ColonSeparator ~
-      NlWs ~ CloseBracket ~ NlWs ~>
+      ColonSeparator ~ NlWs ~
+      CloseBracket ~ NlWs ~>
       ((name: MaeString, keys: MaeStringsBlock, values: MaeStringsBlock) =>
         MaeArray(name.value.trim(), keys.lines, values.lines))
   }
