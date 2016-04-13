@@ -12,3 +12,7 @@ case class MaeObject(name: String, fields: Map[MaeValue, MaeValue]) extends MaeV
 case class MaeArray(name: String, header: Seq[MaeValue], elements: Seq[MaeValue]) extends MaeValue
 
 case class MaeString(value: String) extends MaeValue
+
+object MaeString {
+  implicit def fromString(s: String): MaeString = MaeString(s)
+}
