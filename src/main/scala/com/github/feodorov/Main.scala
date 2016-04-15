@@ -1,7 +1,5 @@
 package com.github.feodorov
 
-import java.io.ByteArrayOutputStream
-
 import scala.util.Success
 import com.github.feodorov.mae._
 import MaeString._

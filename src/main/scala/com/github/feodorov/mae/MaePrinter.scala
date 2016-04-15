@@ -21,13 +21,13 @@ object MaePrinter {
 
       case o: MaeObject =>
         val (arrs, kvs) = o.fields.partition(_._2.isInstanceOf[MaeArray])
-        val keys = kvs.keys
+        val (keys, vals) = kvs.iterator.toList.unzip
 
         pw.println(s"${o.name} {".trim())
 
         keys.foreach(k => print(k, " "))
         if (kvs.nonEmpty) pw.println(" :::")
-        keys.map(kvs).foreach(k => print(k, " "))
+        vals.foreach(k => print(k, " "))
 
         arrs.foreach(p => print(p._2, " "))
 
