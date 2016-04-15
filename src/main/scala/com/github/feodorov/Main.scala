@@ -3,7 +3,9 @@ package com.github.feodorov
 import java.io.ByteArrayOutputStream
 
 import scala.util.Success
-import com.github.feodorov.mae._, MaeString._
+import com.github.feodorov.mae._
+import MaeString._
+import com.github.feodorov.mae.utils.IoOps
 
 /**
   * @author kfeodorov 
@@ -24,39 +26,35 @@ object Main extends App {
   val opType = OpType.withName(args(1))
   val key = args(2)
 
-  //catch block is left intentionally
-  val input = scala.io.Source.fromFile(args.head)
-  val parser = new MaeParser(input.mkString)
-
-  parser.Mae.run() match {
-    case Success(result) =>
-      val idx = result.indexWhere {
-        case MaeObject("f_m_ct", _) => true
-        case _ => false
-      }
-
-      if (idx == -1) {
-        println("no f_m_ct block found")
-        System.exit(1)
-      }
-      else {
-        val fmct = result(idx).asInstanceOf[MaeObject]
-
-        if (opType == OpType.write) {
-          val value = args(3)
-          val resultMae = result.updated(idx, fmct.copy(fields = fmct.fields + (MaeString(key) -> MaeString(value))))
-          val baos = new ByteArrayOutputStream()
-          MaePrinter.print(baos, resultMae)
-          baos.close()
-          println(baos.toString)
-        } else if (opType == OpType.read) {
-          MaePrinter.print(System.out, Seq(fmct.fields(key)))
+  IoOps.withStream(scala.io.Source.fromFile(args.head)) { input =>
+    new MaeParser(input.mkString).Mae.run() match {
+      case Success(result) =>
+        val idx = result.indexWhere {
+          case MaeObject("f_m_ct", _) => true
+          case _ => false
         }
-      }
-    case _ =>
-      println("Cannot parse")
-      System.exit(1)
-  }
 
-  input.close()
+        if (idx == -1) {
+          println("no f_m_ct block found")
+          System.exit(1)
+        }
+        else {
+          val fmct = result(idx).asInstanceOf[MaeObject]
+
+          if (opType == OpType.write) {
+            val value = args(3)
+            val resultMae = result.updated(idx, fmct.copy(fields = fmct.fields + (MaeString(key) -> MaeString(value))))
+            val baos = new ByteArrayOutputStream()
+            MaePrinter.print(baos, resultMae)
+            baos.close()
+            println(baos.toString)
+          } else if (opType == OpType.read) {
+            MaePrinter.print(System.out, Seq(fmct.fields(key)))
+          }
+        }
+      case _ =>
+        println("Cannot parse")
+        System.exit(1)
+    }
+  }
 }
