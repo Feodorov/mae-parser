@@ -28,7 +28,7 @@ object Main extends App {
 
   IoOps.withStream(scala.io.Source.fromFile(args.head)) { input =>
     new MaeParser(input.mkString).Mae.run() match {
-      case Success(result) =>
+      case Success(result: Seq[_]) =>
         val idx = result.indexWhere {
           case MaeObject("f_m_ct", _) => true
           case _ => false
@@ -41,16 +41,12 @@ object Main extends App {
         else {
           val fmct = result(idx).asInstanceOf[MaeObject]
 
-          if (opType == OpType.write) {
+          MaePrinter.print(System.out, if (opType == OpType.write) {
             val value = args(3)
-            val resultMae = result.updated(idx, fmct.copy(fields = fmct.fields + (MaeString(key) -> MaeString(value))))
-            val baos = new ByteArrayOutputStream()
-            MaePrinter.print(baos, resultMae)
-            baos.close()
-            println(baos.toString)
+            result.updated(idx, fmct.copy(fields = fmct.fields + (MaeString(key) -> MaeString(value))))
           } else if (opType == OpType.read) {
-            MaePrinter.print(System.out, Seq(fmct.fields(key)))
-          }
+            Seq(fmct.fields(key))
+          } else result)
         }
       case _ =>
         println("Cannot parse")
