@@ -18,7 +18,7 @@ object MaeOps {
       new MaeParser(br.mkString).Mae.run() match {
         case Success(result) =>
           val idx = result.indexWhere {
-            case MaeObject(`objName`, _) => true
+            case MaeObject(k, _) if k == objName => true
             case _ => false
           }
 

@@ -20,16 +20,19 @@ object MaePrinter {
       case s: MaeString => pw.println(s"$offset${s.value}")
 
       case o: MaeObject =>
-        val (arrs, kvs) = o.fields.partition(_._2.isInstanceOf[MaeArray])
+        val (arrs, kvs) = o.fields.partition(_._2 match {
+          case _: MaeArray => true
+          case _ => false
+        })
         val (keys, vals) = kvs.iterator.toList.unzip
 
         pw.println(s"${o.name} {".trim())
 
-        keys.foreach(k => print(k, " "))
-        if (kvs.nonEmpty) pw.println(" :::")
-        vals.foreach(k => print(k, " "))
+        keys.foreach(k => print(k, s"$offset "))
+        if (kvs.nonEmpty) pw.println(s"$offset :::")
+        vals.foreach(k => print(k, s"$offset "))
 
-        arrs.foreach(p => print(p._2, " "))
+        arrs.foreach(p => print(p._2, s"$offset "))
 
         pw.println("}")
         pw.println()
